@@ -883,10 +883,10 @@ button:focus-visible{ outline:3px solid var(--accent); outline-offset:2px; }
       <section class="welcome">
         <p class="eyebrow"><bdi>My Reading Notebook</bdi> | מחברת הקריאה שלי</p>
         <h1><bdi dir="ltr">Hi! What's your name?</bdi></h1>
-        <p class="sub">מה השם שלך? הוא יופיע במחברת, והכוכבים יישמרו בשבילך במכשיר הזה.</p>
+        <p class="sub">מה השם שלך? את השם כותבים באנגלית. הוא יופיע במחברת, והכוכבים יישמרו בשבילך במכשיר הזה.</p>
         <form id="name-form" class="field" novalidate>
-          <label for="name-input">השם שלי</label>
-          <input id="name-input" class="name-input" type="text" maxlength="20" autocomplete="given-name" value="${esc(state.nameDraft)}">
+          <label for="name-input">השם שלי באנגלית</label>
+          <input id="name-input" class="name-input" type="text" dir="ltr" lang="en" maxlength="20" autocomplete="given-name" autocapitalize="words" spellcheck="false" placeholder="Dana" value="${esc(state.nameDraft)}">
           <span class="lbl" id="g-lbl">איך לפנות אליך?</span>
           <div class="seg" role="group" aria-labelledby="g-lbl">
             <button type="button" data-act="gender" data-g="f" aria-pressed="${gd === 'f'}">אני בת</button>
@@ -907,6 +907,7 @@ button:focus-visible{ outline:3px solid var(--accent); outline-offset:2px; }
     const v = (input ? input.value : '').trim().replace(/\s+/g, ' ').slice(0, 20);
     let err = '';
     if (!v) err = 'צריך לכתוב שם כדי להתחיל';
+    else if (!/^[A-Za-z][A-Za-z' -]*$/.test(v)) err = 'צריך לכתוב את השם באותיות באנגלית, למשל Dana';
     else if (/^(__proto__|constructor|prototype)$/i.test(v)) err = 'אפשר לנסות שם אחר';
     else if (state.draftG !== 'f' && state.draftG !== 'm') err = 'צריך לבחור: אני בת או אני בן';
     if (err) {
@@ -917,7 +918,7 @@ button:focus-visible{ outline:3px solid var(--accent); outline-offset:2px; }
       return;
     }
     Object.assign(state, { nameErr: '', nameDraft: '', view: 'home' });
-    setProfile(v, state.draftG);
+    setProfile(v.replace(/(^|[ '-])([a-z])/g, (m, p, c) => p + c.toUpperCase()), state.draftG);
     render();
     window.scrollTo(0, 0);
   }
